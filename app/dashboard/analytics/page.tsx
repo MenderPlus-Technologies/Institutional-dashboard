@@ -19,7 +19,7 @@ export default function AnalyticsPage() {
   const [category, setCategory] = useState(categoryFilterOptions[0]);
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Fund Analytics"
         subtitle="Detailed breakdown of program expenditure and deployment efficiency"
@@ -44,14 +44,14 @@ export default function AnalyticsPage() {
         </Select>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Deposited" value={formatCurrency(analyticsStats.totalDeposited)} subtitle="Lifetime program deposits" icon={DollarSign} />
         <StatCard title="Total Disbursed" value={formatCurrency(analyticsStats.totalDisbursed)} subtitle="Funds deployed to beneficiaries" icon={Send} iconColor="bg-emerald-50 text-emerald-600" />
         <StatCard title="Deployment Rate" value={`${analyticsStats.deploymentRate.toFixed(1)}%`} subtitle="% of deposits reaching beneficiaries" icon={Percent} iconColor="bg-[#009688]/10 text-[#009688]" />
         <StatCard title="Cost per Beneficiary" value={formatCurrency(analyticsStats.costPerBeneficiary)} subtitle="Average spend per enrolled individual" icon={User} iconColor="bg-amber-50 text-amber-600" />
       </div>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {[
           { title: "Monthly Disbursement Volume GTV", icon: BarChart3, desc: "No disbursements yet" },
           { title: "Spend by Health Category", icon: PieChart, desc: "No spend data yet" },
@@ -60,7 +60,7 @@ export default function AnalyticsPage() {
         ].map((chart) => (
           <Card key={chart.title}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold sm:text-base">{chart.title}</CardTitle>
+              <CardTitle>{chart.title}</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartPlaceholder icon={chart.icon} title="No data yet" description={chart.desc} height="h-48 sm:h-56" />
@@ -71,7 +71,7 @@ export default function AnalyticsPage() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold sm:text-base">Beneficiary Spend Distribution</CardTitle>
+          <CardTitle>Beneficiary Spend Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartPlaceholder icon={Users} title="No beneficiary spend yet" description="Distribution will appear after disbursements." height="h-44 sm:h-48" />
@@ -82,8 +82,8 @@ export default function AnalyticsPage() {
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle className="text-sm font-semibold sm:text-base">Per-Beneficiary Spend Ledger</CardTitle>
-              <p className="text-xs text-[#9aa1b4]">Exportable</p>
+              <CardTitle>Per-Beneficiary Spend Ledger</CardTitle>
+              <p className="text-caption">Exportable</p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Select defaultValue="All Categories">
@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <EmptyState icon={Receipt} description="Ledger populates after first disbursements." className="py-8" />
+          <EmptyState icon={Receipt} description="Ledger populates after first disbursements." />
         </CardContent>
       </Card>
     </div>

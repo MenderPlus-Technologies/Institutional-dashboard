@@ -80,15 +80,15 @@
   }
 
   h1 {
-    @apply plusJakarta text-4xl font-semibold leading-[1.15] tracking-[-0.02em] text-[#0d0d12];
+    @apply text-page-title;
   }
 
   h2 {
-    @apply plusJakarta text-2xl font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+    @apply text-section-heading;
   }
 
   h3 {
-    @apply plusJakarta text-lg font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+    @apply text-card-title;
   }
 
   code,
@@ -167,5 +167,33 @@
 
   .animate-fade-in-right {
     animation: fadeInRight 0.2s ease forwards;
+  }
+
+  .text-page-title {
+    @apply plusJakarta text-2xl font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+  }
+
+  .text-section-heading {
+    @apply plusJakarta text-base font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+  }
+
+  .text-card-title {
+    @apply plusJakarta text-sm font-semibold leading-snug text-[#0d0d12];
+  }
+
+  .text-body {
+    @apply interFont text-sm leading-relaxed text-[#0d0d12];
+  }
+
+  .text-caption {
+    @apply interFont text-xs leading-relaxed text-[#9aa1b4];
+  }
+
+  .text-stat {
+    @apply plusJakarta text-2xl font-bold leading-none tracking-[-0.02em] text-[#0d0d12];
+  }
+
+  .text-overline {
+    @apply interFont text-[10px] font-semibold uppercase tracking-widest text-[#9aa1b4];
   }
 }

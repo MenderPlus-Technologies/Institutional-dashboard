@@ -18,7 +18,7 @@ export default function BeneficiariesPage() {
   const [activeProgram, setActiveProgram] = useState("maternal");
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Beneficiaries"
         subtitle={`Manage individual program enrollments · ${organization.program}`}
@@ -49,7 +49,7 @@ export default function BeneficiariesPage() {
 
       <ProgramTabs active={activeProgram} onChange={setActiveProgram} />
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Enrolled" value={String(beneficiaryStats.totalEnrolled)} subtitle="Import or add individually" icon={Users} />
         <StatCard title="Active (transacted 7d)" value={String(beneficiaryStats.activeTransacted7d)} subtitle="—" icon={UserCheck} iconColor="bg-emerald-50 text-emerald-600" />
         <StatCard title="Pending Wallet Setup" value={String(beneficiaryStats.pendingWalletSetup)} subtitle="Awaiting first login" icon={Clock} iconColor="bg-amber-50 text-amber-600" />
@@ -73,7 +73,7 @@ export default function BeneficiariesPage() {
               Export <ChevronDown className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-sm font-medium text-[#0d0d12]">
+          <p className="text-body font-medium">
             Enrolled Individuals <span className="font-normal text-[#9aa1b4]">{beneficiaryStats.totalEnrolled} total</span>
           </p>
         </CardHeader>

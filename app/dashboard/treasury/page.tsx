@@ -18,7 +18,7 @@ export default function TreasuryPage() {
   const [typeFilter, setTypeFilter] = useState("All Types");
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Treasury"
         subtitle="Deposits, disbursements, withdrawals & float earnings"
@@ -37,7 +37,7 @@ export default function TreasuryPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard title="Current Balance" value={formatCurrency(treasuryStats.currentBalance)} subtitle="Available to disburse or withdraw" icon={Wallet} />
         <StatCard title="Total Deposited (Lifetime)" value={formatCurrency(treasuryStats.totalDepositedLifetime)} subtitle="All inflows to programme" icon={ArrowDownToLine} iconColor="bg-emerald-50 text-emerald-600" />
         <StatCard
@@ -52,7 +52,7 @@ export default function TreasuryPage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle className="text-sm font-semibold sm:text-base">Transaction Ledger</CardTitle>
+            <CardTitle>Transaction Ledger</CardTitle>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-full sm:w-44"><SelectValue /></SelectTrigger>
@@ -83,27 +83,27 @@ export default function TreasuryPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold sm:text-base">Treasury Float</CardTitle>
+            <CardTitle>Treasury Float</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-xl bg-amber-50 p-4 sm:p-5">
-              <p className="text-sm text-[#666d80]">Earned this month</p>
-              <p className="plusJakarta text-3xl font-bold leading-none tracking-[-0.02em] text-[#0d0d12]">{formatCurrency(treasuryStats.floatEarnedThisMonth)}</p>
+            <div className="rounded-xl bg-amber-50 p-3.5">
+              <p className="text-caption">Earned this month</p>
+              <p className="text-stat mt-0.5">{formatCurrency(treasuryStats.floatEarnedThisMonth)}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-[#9aa1b4]">Annual rate</p>
-                <p className="font-semibold text-[#0d0d12]">{treasuryStats.floatAnnualRate}%</p>
+                <p className="text-caption">Annual rate</p>
+                <p className="text-body font-semibold">{treasuryStats.floatAnnualRate}%</p>
               </div>
               <div>
-                <p className="text-[#9aa1b4]">Avg balance</p>
-                <p className="font-semibold text-[#0d0d12]">{formatCurrency(treasuryStats.avgBalance)}</p>
+                <p className="text-caption">Avg balance</p>
+                <p className="text-body font-semibold">{formatCurrency(treasuryStats.avgBalance)}</p>
               </div>
             </div>
-            <p className="text-xs text-[#9aa1b4]">
+            <p className="text-caption">
               Float accrues daily on undeployed balance. Credited monthly.
             </p>
           </CardContent>
@@ -111,23 +111,23 @@ export default function TreasuryPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold sm:text-base">Withdrawal Policy</CardTitle>
+            <CardTitle>Withdrawal Policy</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-[#666d80]">
+            <p className="text-body text-[#666d80]">
               Organisations may withdraw unused program funds back to their registered bank account at any time.
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b pb-2">
-                <span className="text-[#9aa1b4]">Withdrawal fee</span>
+                <span className="text-caption">Withdrawal fee</span>
                 <span className="font-medium">{withdrawalPolicy.feePercent}% of amount</span>
               </div>
               <div className="flex justify-between border-b pb-2">
-                <span className="text-[#9aa1b4]">Processing time</span>
+                <span className="text-caption">Processing time</span>
                 <span className="font-medium">{withdrawalPolicy.processingDays}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#9aa1b4]">Minimum withdrawal</span>
+                <span className="text-caption">Minimum withdrawal</span>
                 <span className="font-medium">${withdrawalPolicy.minimumUSD} USD equiv.</span>
               </div>
             </div>

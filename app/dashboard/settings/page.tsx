@@ -14,7 +14,7 @@ import { organization, teamMembers, programFullNames } from "@/lib/mock-data";
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Settings"
         subtitle="Configure your organisation, programs, and portal preferences"
@@ -23,7 +23,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Organisation Profile</CardTitle>
+          <CardTitle>Organisation Profile</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
@@ -67,7 +67,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Bank Account for Withdrawals</CardTitle>
+          <CardTitle>Bank Account for Withdrawals</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
@@ -97,7 +97,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Security</CardTitle>
+          <CardTitle>Security</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
@@ -115,15 +115,15 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between md:col-span-2">
             <div>
-              <p className="text-sm font-medium">Two-Factor Authentication</p>
-              <p className="text-xs text-[#9aa1b4]">Require a code from your authenticator app on login</p>
+              <p className="text-body font-medium">Two-Factor Authentication</p>
+              <p className="text-caption">Require a code from your authenticator app on login</p>
             </div>
             <Switch />
           </div>
           <div className="flex items-center justify-between md:col-span-2">
             <div>
-              <p className="text-sm font-medium">Login Notifications</p>
-              <p className="text-xs text-[#9aa1b4]">Email alert on every new login to the portal</p>
+              <p className="text-body font-medium">Login Notifications</p>
+              <p className="text-caption">Email alert on every new login to the portal</p>
             </div>
             <Switch defaultChecked />
           </div>
@@ -132,7 +132,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Dashboard Preferences</CardTitle>
+          <CardTitle>Dashboard Preferences</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -180,8 +180,8 @@ export default function SettingsPage() {
           ].map((pref) => (
             <div key={pref.label} className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium">{pref.label}</p>
-                <p className="text-xs text-[#9aa1b4]">{pref.desc}</p>
+                <p className="text-body font-medium">{pref.label}</p>
+                <p className="text-caption">{pref.desc}</p>
               </div>
               <Switch defaultChecked />
             </div>
@@ -191,7 +191,7 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Notifications & Alerts</CardTitle>
+          <CardTitle>Notifications & Alerts</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {[
@@ -203,8 +203,8 @@ export default function SettingsPage() {
           ].map((item) => (
             <div key={item.label} className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium">{item.label}</p>
-                <p className="text-xs text-[#9aa1b4]">{item.desc}</p>
+                <p className="text-body font-medium">{item.label}</p>
+                <p className="text-caption">{item.desc}</p>
               </div>
               <Switch defaultChecked={item.label !== "Weekly Digest"} />
             </div>
@@ -225,7 +225,7 @@ export default function SettingsPage() {
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-base">Team Access</CardTitle>
+            <CardTitle>Team Access</CardTitle>
             <CardDescription>Manage who can access this organisation&apos;s portal.</CardDescription>
           </div>
           <ModalInviteMember>
@@ -236,18 +236,18 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {teamMembers.map((member) => (
-            <div key={member.id} className="flex items-center gap-3 rounded-lg border p-4">
+            <div key={member.id} className="flex items-center gap-3 rounded-lg border p-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#009688]/15 text-sm font-bold text-[#009688]">
                 {member.initials}
               </div>
               <div className="flex-1">
-                <p className="font-medium text-[#0d0d12]">{member.name}</p>
-                <p className="text-sm text-[#9aa1b4]">{member.role}</p>
+                <p className="text-body font-medium">{member.name}</p>
+                <p className="text-caption">{member.role}</p>
               </div>
               <Badge variant="success">{member.badge}</Badge>
             </div>
           ))}
-          <p className="text-xs text-[#666d80]">
+          <p className="text-caption text-[#666d80]">
             Roles: Owner · Admin · Analyst (view-only) · Auditor (reports only)
           </p>
         </CardContent>

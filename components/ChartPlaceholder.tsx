@@ -14,7 +14,7 @@ export function ChartPlaceholder({
   title,
   description,
   action,
-  height = "h-64",
+  height = "h-56",
 }: ChartPlaceholderProps) {
   return (
     <div
@@ -23,12 +23,10 @@ export function ChartPlaceholder({
         height
       )}
     >
-      <Icon className="mb-3 h-8 w-8 text-[#009688]/30" />
-      <p className="plusJakarta text-sm font-semibold text-[#0d0d12]">{title}</p>
-      <p className="interFont mt-1 max-w-xs text-center text-xs leading-relaxed text-[#9aa1b4]">
-        {description}
-      </p>
-      {action && <div className="mt-4">{action}</div>}
+      <Icon className="mb-2 h-7 w-7 text-[#009688]/30" />
+      <p className="text-card-title">{title}</p>
+      <p className="text-caption mt-1 max-w-xs text-center">{description}</p>
+      {action && <div className="mt-3">{action}</div>}
     </div>
   );
 }

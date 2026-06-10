@@ -5,6 +5,7 @@ import {
   Wallet, Users, TrendingUp, Heart, ArrowDownToLine, ArrowUpFromLine,
   BarChart3, PieChart, ShieldAlert, CheckCircle2, Megaphone, UserPlus, FileText, Bell, Target,
 } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import { ProgramTabs } from "@/components/ProgramTabs";
 import { PeriodTabs } from "@/components/PeriodTabs";
 import { StatCard } from "@/components/StatCard";
@@ -60,31 +61,24 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      <div className="space-y-4">
-        <div className="min-w-0">
-          <h1 className="plusJakarta text-2xl font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12] sm:text-4xl sm:leading-[1.15] sm:tracking-[-0.02em]">Program Overview</h1>
-          <p className="mt-1 text-xs text-[#9aa1b4] sm:text-sm">
-            Live · {organization.name} · {organization.program}
-          </p>
-        </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Program Overview"
+        subtitle={`Live · ${organization.name} · ${organization.program}`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {headerActions}
+            <PeriodTabs items={periodFilters} active={activePeriod} onChange={setActivePeriod} />
+          </div>
+        }
+      />
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">{headerActions}</div>
-          <PeriodTabs
-            items={periodFilters}
-            active={activePeriod}
-            onChange={setActivePeriod}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         <ModalDeposit>
-          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-4 text-left shadow-card hover:shadow-card-hover transition-shadow duration-200 sm:p-5">
+          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
             <div className="min-w-0">
-              <p className="font-semibold text-[#0d0d12]">Deposit Funds</p>
-              <p className="text-xs text-[#9aa1b4] sm:text-sm">Add program budget to your ring-fenced wallet</p>
+              <p className="text-body font-semibold">Deposit Funds</p>
+              <p className="text-caption">Add program budget to your ring-fenced wallet</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#009688]/10 text-[#009688]">
               <ArrowDownToLine className="h-5 w-5" />
@@ -92,10 +86,10 @@ export default function DashboardPage() {
           </button>
         </ModalDeposit>
         <ModalDisburse>
-          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-4 text-left shadow-card hover:shadow-card-hover transition-shadow duration-200 sm:p-5">
+          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
             <div className="min-w-0">
-              <p className="font-semibold text-[#0d0d12]">Disburse Funds</p>
-              <p className="text-xs text-[#9aa1b4] sm:text-sm">Send funds to enrolled beneficiaries</p>
+              <p className="text-body font-semibold">Disburse Funds</p>
+              <p className="text-caption">Send funds to enrolled beneficiaries</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <ArrowUpFromLine className="h-5 w-5" />
@@ -106,13 +100,13 @@ export default function DashboardPage() {
 
       <ProgramTabs active={activeProgram} onChange={setActiveProgram} />
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Program Funds Managed"
           value={formatCurrency(overviewStats.programFundsManaged)}
           icon={Wallet}
           footer={
-            <p className="text-xs text-[#9aa1b4]">
+            <p className="text-caption">
               No deposits yet —{" "}
               <ModalDeposit>
                 <button className="font-medium text-[#009688] hover:underline">Deposit now</button>
@@ -126,7 +120,7 @@ export default function DashboardPage() {
           icon={Users}
           iconColor="bg-[#009688]/10 text-[#009688]"
           footer={
-            <p className="text-xs text-[#9aa1b4]">
+            <p className="text-caption">
               No enrollments yet —{" "}
               <ModalEnrolIndividual>
                 <button className="font-medium text-[#009688] hover:underline">Add beneficiaries</button>
@@ -150,27 +144,26 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold sm:text-base">Fund Utilisation by Month</CardTitle>
-            <p className="text-xs text-[#9aa1b4]">6-month view</p>
+          <CardHeader>
+            <CardTitle>Fund Utilisation by Month</CardTitle>
+            <p className="text-caption">6-month view</p>
           </CardHeader>
           <CardContent>
             <ChartPlaceholder
               icon={BarChart3}
               title="No data yet"
               description="Deposit and disburse to populate this chart."
-              height="h-52 sm:h-64"
             />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold sm:text-base">Outcome Indicators</CardTitle>
-              <span className="text-xs text-[#9aa1b4]">Program start</span>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle>Outcome Indicators</CardTitle>
+              <span className="text-caption">Program start</span>
             </div>
           </CardHeader>
           <CardContent>
@@ -183,33 +176,32 @@ export default function DashboardPage() {
                   <Button size="sm">Enrol Beneficiaries</Button>
                 </ModalEnrolIndividual>
               }
-              height="h-52 sm:h-64"
             />
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold sm:text-base">Spend by Category</CardTitle>
+          <CardHeader>
+            <CardTitle>Spend by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmptyState icon={PieChart} description="No transactions yet." className="py-6 sm:py-8" />
+            <EmptyState icon={PieChart} description="No transactions yet." />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold sm:text-base">Leakage Rate</CardTitle>
+          <CardHeader>
+            <CardTitle>Leakage Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 py-2 text-center sm:py-4">
-              <p className="plusJakarta text-3xl font-bold leading-none tracking-[-0.02em] text-[#22c55e]">{overviewStats.leakageRate}%</p>
-              <p className="text-xs text-[#9aa1b4] sm:text-sm">
+            <div className="space-y-2 py-1 text-center">
+              <p className="text-stat text-[#22c55e]">{overviewStats.leakageRate}%</p>
+              <p className="text-caption">
                 vs {overviewStats.sectorLeakageAvg} sector average
               </p>
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+              <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-caption text-emerald-800">
                 <ShieldAlert className="h-4 w-4 shrink-0" />
                 <span>All transactions ring-fenced to approved health categories only</span>
               </div>
@@ -218,14 +210,14 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="md:col-span-2 lg:col-span-1">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold sm:text-base">Flagged Beneficiaries</CardTitle>
-              <span className="text-xs text-[#9aa1b4]">Action needed</span>
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle>Flagged Beneficiaries</CardTitle>
+              <span className="text-caption">Action needed</span>
             </div>
           </CardHeader>
           <CardContent>
-            <EmptyState icon={CheckCircle2} description="No flags yet." className="py-6 sm:py-8" />
+            <EmptyState icon={CheckCircle2} description="No flags yet." />
           </CardContent>
         </Card>
       </div>

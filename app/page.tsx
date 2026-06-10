@@ -23,15 +23,15 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9fb] px-4 py-8 sm:px-6">
       <div className="mb-8 flex flex-col items-center text-center">
         <InduraLogo size="lg" className="mb-3 items-center" />
-        <p className="mt-1 max-w-sm text-sm text-[#9aa1b4]">
+        <p className="text-caption mt-1 max-w-sm">
           Institutional Program Portal — Financial Infrastructure for African Healthcare
         </p>
       </div>
 
       <Card className="w-full max-w-md">
-        <CardContent className="p-6 sm:p-8">
-          <h2 className="plusJakarta text-lg font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12]">Sign in to your portal</h2>
-          <p className="interFont mt-2 text-sm leading-relaxed text-[#9aa1b4]">
+        <CardContent className="p-5">
+          <h2 className="text-section-heading">Sign in to your portal</h2>
+          <p className="text-caption mt-2">
             One click. We&apos;ll pull your name and email from your provider. You can complete CAC verification later inside the dashboard.
           </p>
 

@@ -29,8 +29,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar mobileOpen={mobileOpen} onMobileOpenChange={setMobileOpen} />
       <div className="flex min-h-screen min-w-0 flex-col lg:pl-[240px]">
         <MobileHeader onMenuOpen={() => setMobileOpen(true)} />
-        <main className="flex-1 p-4 sm:p-5 lg:p-6">
-          <div className="mx-auto w-full max-w-[1400px] space-y-6 animate-fade-in-up">
+        <main className="flex-1 p-4 lg:p-5">
+          <div className="mx-auto w-full max-w-[1400px] space-y-5 animate-fade-in-up">
             <CACBanner />
             {children}
           </div>

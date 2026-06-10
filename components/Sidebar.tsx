@@ -78,8 +78,8 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
           <InduraLogo size="md" subtitle="Institutional Portal" />
         </div>
 
-        <div className="border-b border-[#e8eaed] px-4 py-3">
-          <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#9aa1b4]">
+        <div className="border-b border-[#e8eaed] px-3 py-2.5">
+          <p className="text-overline mb-1.5 px-2">
             Active Organisation
           </p>
           <Select defaultValue={organization.name}>
@@ -94,10 +94,10 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
           </Select>
         </div>
 
-        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4 scrollbar-thin">
+        <nav className="flex-1 space-y-4 overflow-y-auto px-2 py-3 scrollbar-thin">
           {navSections.map((section) => (
             <div key={section.label}>
-              <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#9aa1b4]">
+              <p className="text-overline mb-1 px-2">
                 {section.label}
               </p>
               <div className="space-y-0.5">
@@ -135,8 +135,8 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="border-t border-[#e8eaed] p-4">
-          <div className="flex items-center gap-3 rounded-[10px] bg-[#f8f9fb] p-3">
+        <div className="border-t border-[#e8eaed] p-3">
+          <div className="flex items-center gap-2.5 rounded-[10px] bg-[#f8f9fb] p-2.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#009688]/15 text-sm font-bold text-[#009688]">
               {currentUser.initials}
             </div>

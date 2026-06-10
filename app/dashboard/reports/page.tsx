@@ -13,7 +13,7 @@ const reportIcons = [BarChart3, DollarSign, Receipt, Users, MapPin, TrendingUp];
 
 export default function ReportsPage() {
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-5">
       <PageHeader
         title="Reports"
         subtitle="Generate, schedule and download program reports for stakeholders"
@@ -34,16 +34,16 @@ export default function ReportsPage() {
       />
 
       <div>
-        <h3 className="plusJakarta mb-3 text-lg font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12] sm:mb-4">Quick Generate</h3>
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <h3 className="text-section-heading mb-3">Quick Generate</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {reportTypes.map((report, i) => {
             const Icon = reportIcons[i] || FileText;
             return (
               <ModalGenerateReport key={report.id}>
-                <button className="flex h-full flex-col rounded-xl border border-[#e8eaed] bg-white p-4 text-left shadow-card hover:shadow-card-hover transition-shadow duration-200 sm:p-5">
+                <button className="flex h-full flex-col rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
                   <Icon className="mb-2 h-5 w-5 text-[#009688]" />
-                  <p className="text-sm font-semibold text-[#0d0d12] sm:text-base">{report.name}</p>
-                  <p className="mt-1 text-xs text-[#9aa1b4]">{report.description}</p>
+                  <p className="text-body font-semibold">{report.name}</p>
+                  <p className="text-caption mt-1">{report.description}</p>
                 </button>
               </ModalGenerateReport>
             );
@@ -53,7 +53,7 @@ export default function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold sm:text-base">Scheduled Reports</CardTitle>
+          <CardTitle>Scheduled Reports</CardTitle>
           <CardDescription>Automated Report Schedule</CardDescription>
         </CardHeader>
         <CardContent>
@@ -75,7 +75,7 @@ export default function ReportsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold sm:text-base">Report History</CardTitle>
+          <CardTitle>Report History</CardTitle>
           <CardDescription>Generated Reports</CardDescription>
         </CardHeader>
         <CardContent>
