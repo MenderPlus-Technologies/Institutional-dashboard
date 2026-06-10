@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/GeistMono-Variable.woff2")
+    format("woff2");
+}
+
+@layer base {
+  :root {
+    --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+    --radius: 0.75rem;
+
+    /* Brand */
+    --brand-primary: #009688;
+    --brand-primary-hover: #00897b;
+    --brand-primary-light: rgba(0, 150, 136, 0.08);
+    --brand-primary-mid: rgba(0, 150, 136, 0.15);
+
+    /* Neutrals */
+    --color-ink: #0d0d12;
+    --color-ink-muted: #666d80;
+    --color-ink-subtle: #9aa1b4;
+    --color-surface: #ffffff;
+    --color-surface-2: #f8f9fb;
+    --color-surface-3: #f1f3f7;
+    --color-border: #e8eaed;
+    --color-border-strong: #d1d5db;
+
+    /* Semantic */
+    --color-success: #22c55e;
+    --color-success-bg: #f0fdf4;
+    --color-warning: #f59e0b;
+    --color-warning-bg: #fffbeb;
+    --color-danger: #ef4444;
+    --color-danger-bg: #fef2f2;
+
+    /* Tailwind overrides */
+    --background: #f8f9fb;
+    --foreground: #0d0d12;
+    --card: #ffffff;
+    --card-foreground: #0d0d12;
+    --popover: #ffffff;
+    --popover-foreground: #0d0d12;
+    --primary: #009688;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f3f7;
+    --secondary-foreground: #0d0d12;
+    --muted: #f1f3f7;
+    --muted-foreground: #666d80;
+    --accent: rgba(0, 150, 136, 0.08);
+    --accent-foreground: #009688;
+    --border: #e8eaed;
+    --input: #e8eaed;
+    --ring: #009688;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #0d0d12;
+    --sidebar-primary: #009688;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgba(0, 150, 136, 0.08);
+    --sidebar-accent-foreground: #009688;
+    --sidebar-border: #e8eaed;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-[#f8f9fb] text-foreground;
+  }
+
+  h1 {
+    @apply plusJakarta text-4xl font-semibold leading-[1.15] tracking-[-0.02em] text-[#0d0d12];
+  }
+
+  h2 {
+    @apply plusJakarta text-2xl font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+  }
+
+  h3 {
+    @apply plusJakarta text-lg font-semibold leading-snug tracking-[-0.01em] text-[#0d0d12];
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+  }
+}
+
+@layer utilities {
+  .plusJakarta {
+    font-family: var(--font-plus-jakarta) !important;
+  }
+
+  .interFont {
+    font-family: var(--font-inter) !important;
+  }
+
+  .font-mono {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  .shadow-card {
+    box-shadow:
+      0 1px 3px 0 rgba(13, 13, 18, 0.06),
+      0 1px 2px -1px rgba(13, 13, 18, 0.04);
+  }
+
+  .shadow-card-hover {
+    box-shadow:
+      0 4px 12px -2px rgba(13, 13, 18, 0.1),
+      0 2px 6px -2px rgba(13, 13, 18, 0.06);
+  }
+
+  .shadow-modal {
+    box-shadow:
+      0 20px 48px -8px rgba(13, 13, 18, 0.18),
+      0 8px 24px -4px rgba(13, 13, 18, 0.1);
+  }
+
+  .shadow-nav {
+    box-shadow: 0 1px 0 0 #e8eaed;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.25s ease forwards;
+  }
+
+  .animate-fade-in-right {
+    animation: fadeInRight 0.2s ease forwards;
+  }
+}
