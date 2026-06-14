@@ -40,7 +40,7 @@ export default function ReportsPage() {
             const Icon = reportIcons[i] || FileText;
             return (
               <ModalGenerateReport key={report.id}>
-                <button className="flex h-full flex-col rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+                <button className="flex h-full flex-col rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-none">
                   <Icon className="mb-2 h-5 w-5 text-[#009688]" />
                   <p className="text-body font-semibold">{report.name}</p>
                   <p className="text-caption mt-1">{report.description}</p>

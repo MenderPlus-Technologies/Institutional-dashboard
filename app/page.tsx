@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { setLoggedIn } from "@/lib/session";
-import { InduraLogo } from "@/components/InduraLogo";
+import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,20 +21,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9fb] px-4 py-8 sm:px-6">
-      <div className="mb-8 flex flex-col items-center text-center">
-        <InduraLogo size="lg" className="mb-3 items-center" />
-        <p className="text-caption mt-1 max-w-sm">
-          Institutional Program Portal — Financial Infrastructure for African Healthcare
+    <AuthLayout
+      footer={
+        <p className="text-caption">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="font-medium text-[#009688] hover:underline">
+            Sign up
+          </Link>
         </p>
-      </div>
-
-      <Card className="w-full max-w-md">
+      }
+    >
+      <Card className="w-full max-w-md shadow-none">
         <CardContent className="p-5">
           <h2 className="text-section-heading">Sign in to your portal</h2>
-          <p className="text-caption mt-2">
-            One click. We&apos;ll pull your name and email from your provider. You can complete CAC verification later inside the dashboard.
-          </p>
 
           <div className="mt-6 space-y-3">
             <Button variant="outline" className="w-full justify-center gap-2" onClick={enterPortal}>
@@ -89,6 +89,6 @@ export default function LoginPage() {
           </p>
         </CardContent>
       </Card>
-    </div>
+    </AuthLayout>
   );
 }

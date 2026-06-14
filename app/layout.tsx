@@ -17,6 +17,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "InduraHealth — Institutional Portal",
   description: "Financial infrastructure portal for African healthcare programs",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

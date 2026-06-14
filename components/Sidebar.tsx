@@ -13,18 +13,20 @@ import {
   Settings,
   LogOut,
   X,
+  ChevronUp,
+  User,
 } from "lucide-react";
 import { InduraLogo } from "@/components/InduraLogo";
 import { cn } from "@/lib/utils";
-import { navSections, organization, currentUser, orgOptions } from "@/lib/mock-data";
+import { navSections, currentUser } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   LayoutDashboard,
@@ -48,6 +50,11 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
     clearSession();
     onMobileOpenChange(false);
     router.push("/");
+  };
+
+  const navigateToSettings = (section: "organisation" | "dashboard") => {
+    onMobileOpenChange(false);
+    router.push(`/dashboard/settings?section=${section}`);
   };
 
   return (
@@ -76,22 +83,6 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
 
         <div className="border-b border-[#e8eaed] px-5 py-5">
           <InduraLogo size="md" subtitle="Institutional Portal" />
-        </div>
-
-        <div className="border-b border-[#e8eaed] px-3 py-2.5">
-          <p className="text-overline mb-1.5 px-2">
-            Active Organisation
-          </p>
-          <Select defaultValue={organization.name}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {orgOptions.map((org) => (
-                <SelectItem key={org} value={org}>{org}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         <nav className="flex-1 space-y-4 overflow-y-auto px-2 py-3 scrollbar-thin">
@@ -136,24 +127,41 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
         </nav>
 
         <div className="border-t border-[#e8eaed] p-3">
-          <div className="flex items-center gap-2.5 rounded-[10px] bg-[#f8f9fb] p-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#009688]/15 text-sm font-bold text-[#009688]">
-              {currentUser.initials}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="interFont truncate text-sm font-medium text-[#0d0d12]">{currentUser.name}</p>
-              <p className="interFont truncate text-xs text-[#9aa1b4]">{currentUser.role}</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="shrink-0 rounded-[10px] p-1.5 text-[#9aa1b4] transition-colors duration-150 hover:bg-[#009688]/8 hover:text-[#009688]"
-              aria-label="Log out"
-              title="Log out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="group flex w-full items-center gap-2.5 rounded-[10px] bg-[#f8f9fb] p-2.5 text-left transition-colors duration-150 hover:bg-[#009688]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009688]/15"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#009688]/15 text-sm font-bold text-[#009688]">
+                  {currentUser.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="interFont truncate text-sm font-medium text-[#0d0d12]">{currentUser.name}</p>
+                  <p className="interFont truncate text-xs text-[#9aa1b4]">{currentUser.role}</p>
+                </div>
+                <ChevronUp className="h-4 w-4 shrink-0 text-[#9aa1b4] transition-transform duration-150 group-data-[state=open]:rotate-180" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="top" className="w-[216px]">
+              <DropdownMenuItem onClick={() => navigateToSettings("organisation")}>
+                <User className="h-4 w-4" />
+                View profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigateToSettings("dashboard")}>
+                <Settings className="h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-[#ef4444] focus:bg-red-50 focus:text-[#dc2626]"
+              >
+                <LogOut className="h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
     </>

@@ -21,7 +21,7 @@ import { ModalInviteMember } from "@/components/ModalInviteMember";
 import { ModalGenerateReport } from "@/components/ModalGenerateReport";
 import { ModalAlerts } from "@/components/ModalAlerts";
 import { ModalEnrolIndividual } from "@/components/ModalEnrolIndividual";
-import { overviewStats, periodFilters, organization } from "@/lib/mock-data";
+import { overviewStats, periodFilters } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -64,7 +64,7 @@ export default function DashboardPage() {
     <div className="space-y-5">
       <PageHeader
         title="Program Overview"
-        subtitle={`Live · ${organization.name} · ${organization.program}`}
+        subtitle="Live program overview"
         actions={
           <div className="flex flex-wrap items-center gap-2">
             {headerActions}
@@ -75,7 +75,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <ModalDeposit>
-          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-none">
             <div className="min-w-0">
               <p className="text-body font-semibold">Deposit Funds</p>
               <p className="text-caption">Add program budget to your ring-fenced wallet</p>
@@ -86,7 +86,7 @@ export default function DashboardPage() {
           </button>
         </ModalDeposit>
         <ModalDisburse>
-          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-card transition-shadow duration-200 hover:shadow-card-hover">
+          <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-none">
             <div className="min-w-0">
               <p className="text-body font-semibold">Disburse Funds</p>
               <p className="text-caption">Send funds to enrolled beneficiaries</p>
