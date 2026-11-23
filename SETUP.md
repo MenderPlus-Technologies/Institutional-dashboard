@@ -1,5 +1,10 @@
 # Indura Institutional Portal — Setup Guide
 
+> **Status (23 Nov 2026):** steps 1 and 2 are done. The Supabase project `indura-portal` (London region) exists
+> with the full database applied, and its public URL/key are already in `.env.production`, so Netlify needs no
+> environment variables to run. Remaining: deploy on Netlify (step 4), set the Site URL (step 3), make yourself
+> admin (step 5).
+
 This portal is a Next.js app with a Supabase backend (database, logins, file storage), hosted on Netlify.
 Setup takes about 30 minutes and needs no coding.
 
@@ -51,8 +56,8 @@ email + password works.
 1. Go to <https://app.netlify.com> → **Add new site → Import an existing project → GitHub** and choose
    `MenderPlus-Technologies/institutional-dashboard`.
 2. Netlify reads `netlify.toml` automatically. Leave build settings as they are.
-3. Before deploying, open **Site configuration → Environment variables** and add (values from Supabase
-   **Project Settings → API**):
+3. *(Optional — only needed for emailed team invites.)* Open **Site configuration → Environment variables** and
+   add the secret key below. The two public values are already in `.env.production`:
 
    | Key | Value |
    |---|---|
