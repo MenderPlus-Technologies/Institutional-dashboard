@@ -227,17 +227,30 @@ interface SettingsToggleRowProps {
   label: string;
   description: string;
   defaultChecked?: boolean;
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
 }
 
-export function SettingsToggleRow({ label, description, defaultChecked, disabled }: SettingsToggleRowProps) {
+export function SettingsToggleRow({
+  label,
+  description,
+  defaultChecked,
+  checked,
+  onCheckedChange,
+  disabled,
+}: SettingsToggleRowProps) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3.5">
       <div className={cn("min-w-0", disabled && "opacity-60")}>
         <p className="text-body font-medium">{label}</p>
         <p className="text-caption">{description}</p>
       </div>
-      <Switch defaultChecked={defaultChecked} disabled={disabled} />
+      <Switch
+        {...(checked !== undefined ? { checked } : { defaultChecked })}
+        onCheckedChange={onCheckedChange}
+        disabled={disabled}
+      />
     </div>
   );
 }

@@ -14,6 +14,8 @@
 @layer base {
   :root {
     --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+    --font-inter: "Inter Variable", system-ui, sans-serif;
+    --font-plus-jakarta: "Plus Jakarta Sans Variable", system-ui, sans-serif;
     --radius: 0.75rem;
 
     /* Brand */

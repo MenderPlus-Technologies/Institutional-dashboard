@@ -1,10 +1,20 @@
 "use client";
 
-import { organization } from "@/lib/mock-data";
 import { getOrgInitials } from "@/lib/utils";
+import { orgTypeLabel } from "@/lib/constants";
+import { usePortal } from "@/lib/portal";
 
 export function DashboardHeader() {
-  const initials = getOrgInitials(organization.name);
+  const { org, activeProgram, programs } = usePortal();
+  if (!org) return null;
+  const initials = getOrgInitials(org.name);
+  const live = org.mode === "live";
+  const programLabel = activeProgram
+    ? activeProgram.name
+    : programs.length
+      ? `${programs.length} programme${programs.length === 1 ? "" : "s"}`
+      : "No programmes yet";
+  const memberSince = new Date(org.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" });
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#009688]/20 bg-gradient-to-br from-white via-white to-[#009688]/10">
@@ -25,22 +35,33 @@ export function DashboardHeader() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <h2 className="plusJakarta truncate text-base font-bold tracking-[-0.02em] text-[#0d0d12] sm:text-lg">
-              {organization.name}
+              {org.name}
             </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            {live ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                </span>
+                Live
               </span>
-              Live
-            </span>
+            ) : (
+              <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-700">
+                Test mode
+              </span>
+            )}
+            {org.cac_status === "verified" && (
+              <span className="inline-flex items-center rounded-full border border-[#009688]/20 bg-[#009688]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#00796b]">
+                CAC verified
+              </span>
+            )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span className="inline-flex max-w-full items-center rounded-md bg-[#009688]/10 px-2 py-0.5 text-xs font-medium text-[#00796b]">
-              {organization.program}
+              {programLabel}
             </span>
             <span className="hidden text-[#d1d5db] sm:inline">·</span>
-            <span className="hidden text-xs text-[#666d80] sm:inline">{organization.orgType}</span>
+            <span className="hidden text-xs text-[#666d80] sm:inline">{orgTypeLabel(org.org_type)}</span>
           </div>
         </div>
 
@@ -49,7 +70,7 @@ export function DashboardHeader() {
             Member since
           </p>
           <p className="plusJakarta mt-0.5 text-sm font-semibold text-[#0d0d12]">
-            {organization.memberSince}
+            {memberSince}
           </p>
         </div>
       </div>

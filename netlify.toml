@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Netlify's Next.js runtime is detected automatically (it powers middleware,
+# the /api routes and /auth callbacks as serverless functions).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

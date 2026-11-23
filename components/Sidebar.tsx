@@ -3,7 +3,6 @@
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearSession } from "@/lib/session";
 import {
   LayoutDashboard,
   Users,
@@ -15,10 +14,13 @@ import {
   X,
   ChevronUp,
   User,
+  ShieldCheck,
 } from "lucide-react";
 import { InduraLogo } from "@/components/InduraLogo";
 import { cn } from "@/lib/utils";
-import { navSections, currentUser } from "@/lib/mock-data";
+import { usePortal } from "@/lib/portal";
+import { ROLE_LABELS } from "@/lib/constants";
+import { getOrgInitials } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -35,6 +37,7 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Landmark,
   FileText,
   Settings,
+  ShieldCheck,
 };
 
 interface SidebarProps {
@@ -45,11 +48,38 @@ interface SidebarProps {
 export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { profile, user, role, beneficiaries, signOut } = usePortal();
+  const displayName = profile?.full_name || user?.email || "Account";
+  const flaggedCount = beneficiaries.filter((b) => b.status === "flagged").length;
+
+  const navSections = [
+    {
+      label: "Main",
+      items: [
+        { label: "Overview", href: "/dashboard", icon: "LayoutDashboard" },
+        {
+          label: "Beneficiaries",
+          href: "/dashboard/beneficiaries",
+          icon: "Users",
+          badge: flaggedCount > 0 ? flaggedCount : undefined,
+        },
+        { label: "Fund Analytics", href: "/dashboard/analytics", icon: "BarChart3" },
+        { label: "Treasury", href: "/dashboard/treasury", icon: "Landmark" },
+        { label: "Reports", href: "/dashboard/reports", icon: "FileText" },
+      ],
+    },
+    {
+      label: "Account",
+      items: [
+        { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
+        ...(profile?.is_indura_admin ? [{ label: "Indura Admin", href: "/admin", icon: "ShieldCheck" }] : []),
+      ],
+    },
+  ];
 
   const handleLogout = () => {
-    clearSession();
     onMobileOpenChange(false);
-    router.push("/");
+    signOut();
   };
 
   const navigateToSettings = (section: "organisation" | "dashboard") => {
@@ -134,11 +164,11 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
                 className="group flex w-full items-center gap-2.5 rounded-[10px] bg-[#f8f9fb] p-2.5 text-left transition-colors duration-150 hover:bg-[#009688]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#009688]/15"
               >
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#009688]/15 text-sm font-bold text-[#009688]">
-                  {currentUser.initials}
+                  {getOrgInitials(displayName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="interFont truncate text-sm font-medium text-[#0d0d12]">{currentUser.name}</p>
-                  <p className="interFont truncate text-xs text-[#9aa1b4]">{currentUser.role}</p>
+                  <p className="interFont truncate text-sm font-medium text-[#0d0d12]">{displayName}</p>
+                  <p className="interFont truncate text-xs text-[#9aa1b4]">{role ? ROLE_LABELS[role] : ""}</p>
                 </div>
                 <ChevronUp className="h-4 w-4 shrink-0 text-[#9aa1b4] transition-transform duration-150 group-data-[state=open]:rotate-180" />
               </button>

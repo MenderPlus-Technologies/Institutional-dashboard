@@ -1,27 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Upload } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FilePicker } from "@/components/FilePicker";
+import { errorMessage, usePortal } from "@/lib/portal";
+import { uploadOrgDocument } from "@/lib/uploads";
+import { getSupabase } from "@/lib/supabase/client";
+import { useToast } from "@/components/ui/toaster";
 
 const documentTypes = [
   { value: "cac", label: "CAC certificate or RC extract" },
@@ -37,7 +30,41 @@ interface ModalRequestOrgChangeProps {
 }
 
 export function ModalRequestOrgChange({ children, currentName }: ModalRequestOrgChangeProps) {
+  const { org, user, refresh } = usePortal();
+  const toast = useToast();
   const [open, setOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [reason, setReason] = useState("");
+  const [docType, setDocType] = useState("cac");
+  const [file, setFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const valid = newName.trim() && reason.trim() && file;
+
+  const submit = async () => {
+    if (!org || !file || !valid) return;
+    setSaving(true);
+    try {
+      const path = await uploadOrgDocument(org.id, file, "name-change");
+      const { error } = await getSupabase().from("change_requests").insert({
+        org_id: org.id,
+        kind: "org_name",
+        payload: { current_name: currentName, new_name: newName.trim(), reason: reason.trim(), document_type: docType },
+        file_path: path,
+        created_by: user?.id,
+      });
+      if (error) throw error;
+      await refresh("requests");
+      toast("Name change request submitted.");
+      setNewName("");
+      setReason("");
+      setFile(null);
+      setOpen(false);
+    } catch (e) {
+      toast(errorMessage(e), "error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -49,8 +76,8 @@ export function ModalRequestOrgChange({ children, currentName }: ModalRequestOrg
             Request Organisation Name Change
           </DialogTitle>
           <DialogDescription>
-            Legal name changes require supporting documentation. Our compliance team will review your
-            request within 2–3 business days.
+            Legal name changes require supporting documentation. Indura&apos;s compliance team reviews requests within 2–3
+            business days.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
@@ -60,50 +87,40 @@ export function ModalRequestOrgChange({ children, currentName }: ModalRequestOrg
           </div>
           <div className="grid gap-2">
             <Label htmlFor="requested-org-name">Requested new name *</Label>
-            <Input id="requested-org-name" placeholder="Legal name as it should appear on the portal" />
+            <Input id="requested-org-name" value={newName} onChange={(e) => setNewName(e.target.value)} />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="change-reason">Reason for change *</Label>
             <Textarea
               id="change-reason"
-              placeholder="Explain why the organisation name is changing (e.g. merger, rebrand, legal restructuring)..."
-              className="min-h-[100px]"
+              placeholder="e.g. merger, rebrand, legal restructuring"
+              className="min-h-[80px]"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
             <Label>Supporting document type *</Label>
-            <Select defaultValue="cac">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Select value={docType} onValueChange={setDocType}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {documentTypes.map((doc) => (
-                  <SelectItem key={doc.value} value={doc.value}>
-                    {doc.label}
-                  </SelectItem>
+                  <SelectItem key={doc.value} value={doc.value}>{doc.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-2">
             <Label>Upload supporting document *</Label>
-            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#e8eaed] bg-[#f8f9fb] px-6 py-8">
-              <Upload className="mb-2 h-6 w-6 text-[#9aa1b4]" />
-              <p className="text-center text-sm text-[#666d80]">
-                CAC certificate, court order, or equivalent legal proof
-              </p>
-              <p className="text-caption mt-1">PDF, JPG, or PNG · Max 10 MB</p>
-              <Button variant="outline" size="sm" className="mt-3">
-                Browse Files
-              </Button>
-            </div>
+            <FilePicker file={file} onChange={setFile} />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={submit} disabled={!valid || saving}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+            Submit Request
           </Button>
-          <Button onClick={() => setOpen(false)}>Submit Request</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

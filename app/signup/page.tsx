@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Building2, Check, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, Check, Loader2, MailCheck, User } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { setLoggedIn } from "@/lib/session";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { SetupNotice } from "@/components/SetupNotice";
+import { COUNTRIES, CURRENCIES, ORG_TYPES } from "@/lib/constants";
 
 const steps = [
   { id: 1, label: "Organisation", icon: Building2 },
@@ -25,30 +26,15 @@ const steps = [
   { id: 3, label: "Review", icon: Check },
 ] as const;
 
-const orgTypes = [
-  { value: "foundation", label: "Foundation / Philanthropy" },
-  { value: "ngo", label: "International NGO" },
-  { value: "bilateral", label: "Bilateral Aid Agency" },
-  { value: "un", label: "UN Agency" },
-  { value: "government", label: "Government Agency" },
-  { value: "hospital", label: "Hospital / Health Network" },
-];
-
-const countries = [
-  "Nigeria",
-  "Ghana",
-  "Kenya",
-  "South Africa",
-  "Rwanda",
-  "Uganda",
-  "Other",
-];
+const orgTypes = ORG_TYPES;
+const countries = COUNTRIES;
 
 interface SignUpForm {
   orgName: string;
   orgType: string;
   country: string;
   website: string;
+  currency: string;
   fullName: string;
   email: string;
   jobTitle: string;
@@ -63,6 +49,7 @@ const initialForm: SignUpForm = {
   orgType: "",
   country: "Nigeria",
   website: "",
+  currency: "NGN",
   fullName: "",
   email: "",
   jobTitle: "",
@@ -73,8 +60,10 @@ const initialForm: SignUpForm = {
 };
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
   const [form, setForm] = useState<SignUpForm>(initialForm);
 
   const update = (fields: Partial<SignUpForm>) => setForm((prev) => ({ ...prev, ...fields }));
@@ -92,11 +81,66 @@ export default function SignUpPage() {
 
   const canSubmit = canContinueStep1 && canContinueStep2 && form.agreedToTerms;
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (!canSubmit) return;
-    setLoggedIn();
-    router.push("/dashboard");
+    setSubmitting(true);
+    setError(null);
+    const sb = getSupabase();
+    const { data, error } = await sb.auth.signUp({
+      email: form.email.trim(),
+      password: form.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        data: {
+          full_name: form.fullName.trim(),
+          job_title: form.jobTitle.trim(),
+          phone: form.phone.trim(),
+          // The organisation is created on first sign-in (after email confirmation).
+          pending_org: {
+            name: form.orgName.trim(),
+            org_type: form.orgType,
+            country: form.country,
+            website: form.website.trim(),
+            currency: form.currency,
+          },
+        },
+      },
+    });
+    if (error) {
+      setError(error.message);
+      setSubmitting(false);
+      return;
+    }
+    if (data.session) {
+      // Email confirmation is switched off: go straight in.
+      window.location.href = "/dashboard";
+      return;
+    }
+    setSentTo(form.email.trim());
+    setSubmitting(false);
   };
+
+  if (!isSupabaseConfigured()) return <SetupNotice />;
+
+  if (sentTo) {
+    return (
+      <AuthLayout>
+        <Card className="w-full max-w-md shadow-none">
+          <CardContent className="space-y-3 p-6 text-center">
+            <MailCheck className="mx-auto h-10 w-10 text-[#009688]" />
+            <h2 className="text-section-heading">Check your email</h2>
+            <p className="text-caption">
+              We sent a confirmation link to <strong>{sentTo}</strong>. Click it to activate your account — your
+              organisation portal will be ready when you sign in.
+            </p>
+            <Link href="/" className="inline-block text-sm font-medium text-[#009688] hover:underline">
+              Back to sign in
+            </Link>
+          </CardContent>
+        </Card>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout
@@ -162,7 +206,7 @@ export default function SignUpPage() {
                 <Label htmlFor="org-name">Organisation name *</Label>
                 <Input
                   id="org-name"
-                  placeholder="e.g. Rockefeller Foundation"
+                  placeholder="Registered name of your organisation"
                   value={form.orgName}
                   onChange={(e) => update({ orgName: e.target.value })}
                 />
@@ -198,6 +242,22 @@ export default function SignUpPage() {
                 </Select>
               </div>
               <div className="grid gap-2">
+                <Label>Programme currency *</Label>
+                <Select value={form.currency} onValueChange={(value) => update({ currency: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-[#9aa1b4]">All deposits, disbursements and reports use this currency.</p>
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="website">Organisation website</Label>
                 <Input
                   id="website"
@@ -215,7 +275,7 @@ export default function SignUpPage() {
                 <Label htmlFor="full-name">Full name *</Label>
                 <Input
                   id="full-name"
-                  placeholder="Amira Hassan"
+                  placeholder="Your full name"
                   value={form.fullName}
                   onChange={(e) => update({ fullName: e.target.value })}
                 />
@@ -294,6 +354,10 @@ export default function SignUpPage() {
                     <dt className="text-[#9aa1b4]">Country</dt>
                     <dd className="text-right font-medium text-[#0d0d12]">{form.country}</dd>
                   </div>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-[#9aa1b4]">Currency</dt>
+                    <dd className="text-right font-medium text-[#0d0d12]">{form.currency}</dd>
+                  </div>
                   {form.website && (
                     <div className="flex justify-between gap-4">
                       <dt className="text-[#9aa1b4]">Website</dt>
@@ -327,12 +391,14 @@ export default function SignUpPage() {
               </div>
 
               <Checkbox
-                label="I agree to the Terms of Service and Privacy Policy"
+                label="I agree to the Terms of Service and Privacy Policy, and confirm I am authorised to register this organisation"
                 checked={form.agreedToTerms}
                 onChange={(e) => update({ agreedToTerms: e.target.checked })}
               />
             </div>
           )}
+
+          {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
             {step > 1 ? (
@@ -354,7 +420,8 @@ export default function SignUpPage() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button className="gap-1.5 sm:ml-auto" disabled={!canSubmit} onClick={handleCreateAccount}>
+              <Button className="gap-1.5 sm:ml-auto" disabled={!canSubmit || submitting} onClick={handleCreateAccount}>
+                {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create account
                 <ArrowRight className="h-4 w-4" />
               </Button>
