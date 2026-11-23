@@ -146,6 +146,16 @@ function LoginContent() {
             </Button>
           </form>
 
+          <div className="mt-4 rounded-xl border border-[#009688]/20 bg-[#009688]/5 px-4 py-3 text-center">
+            <p className="text-sm text-[#0d0d12]">New to the Indura portal?</p>
+            <Link
+              href="/signup"
+              className="mt-2 inline-flex h-9 w-full items-center justify-center rounded-lg border border-[#009688] bg-white text-sm font-semibold text-[#009688] transition-colors hover:bg-[#009688] hover:text-white"
+            >
+              Create an organisation account
+            </Link>
+          </div>
+
           <p className="mt-6 text-center text-xs text-[#9aa1b4]">
             By continuing you agree to complete CAC verification before initiating real withdrawals.
           </p>
