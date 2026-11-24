@@ -6,7 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { clearSession } from "@/lib/session";
 import {
   LayoutDashboard,
+  FolderKanban,
+  Receipt,
   Users,
+  Banknote,
   BarChart3,
   Landmark,
   FileText,
@@ -18,6 +21,8 @@ import {
 } from "lucide-react";
 import { InduraLogo } from "@/components/InduraLogo";
 import { cn } from "@/lib/utils";
+import { useInstitutionDashboard } from "@/hooks/api/use-institution-dashboard";
+import { useInstitutionProfile } from "@/hooks/api/use-institution-profile";
 import { navSections, currentUser } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,7 +35,10 @@ import {
 
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   LayoutDashboard,
+  FolderKanban,
+  Receipt,
   Users,
+  Banknote,
   BarChart3,
   Landmark,
   FileText,
@@ -45,6 +53,9 @@ interface SidebarProps {
 export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: institution } = useInstitutionProfile();
+  const dashboard = useInstitutionDashboard(institution?.id);
+  const beneficiaryCount = dashboard.data?.beneficiaries.total;
 
   const handleLogout = () => {
     clearSession();
@@ -113,9 +124,9 @@ export function Sidebar({ mobileOpen, onMobileOpenChange }: SidebarProps) {
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       <span className="flex-1">{item.label}</span>
-                      {"badge" in item && item.badge !== undefined && (
+                      {item.href === "/dashboard/beneficiaries" && beneficiaryCount !== undefined && (
                         <Badge className="h-5 min-w-5 justify-center bg-[#009688]/10 px-1.5 text-[10px] text-[#009688] hover:bg-[#009688]/10">
-                          {item.badge}
+                          {beneficiaryCount}
                         </Badge>
                       )}
                     </Link>

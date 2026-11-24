@@ -1,90 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { setLoggedIn } from "@/lib/session";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { ArrowRight } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSignInInstitution } from "@/hooks/api/use-institution-mutations";
+import { readAuthToken, readInstitutionId, readSuccessMessage, readUserId } from "@/lib/api/institutions";
+import { setLoggedIn, setUserId } from "@/lib/session";
+import { toastApiSuccess } from "@/lib/toast";
+import { signInFormSchema, toSignInPayload, type SignInFormValues } from "@/schemas/institution";
+
+const defaultValues: SignInFormValues = {
+  email: "",
+  password: "",
+};
+
+const fieldClassName =
+  "h-11 rounded-xl border-[#e4e8ee] bg-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [orgName, setOrgName] = useState("");
+  const submitLock = useRef(false);
+  const signInMutation = useSignInInstitution();
+  const isPending = signInMutation.isPending;
 
-  const enterPortal = () => {
-    setLoggedIn();
-    router.push("/dashboard");
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInFormValues>({
+    resolver: zodResolver(signInFormSchema),
+    defaultValues,
+    mode: "onSubmit",
+  });
+
+  const onSubmit = handleSubmit((values) => {
+    if (submitLock.current || signInMutation.isPending) return;
+    submitLock.current = true;
+
+    signInMutation.mutate(toSignInPayload(values), {
+      onSuccess: (response) => {
+        setLoggedIn(readInstitutionId(response), readAuthToken(response));
+        setUserId(readUserId(response));
+        toastApiSuccess(readSuccessMessage(response) ?? "Signed in successfully");
+        router.push("/dashboard");
+      },
+      onError: () => {
+        submitLock.current = false;
+      },
+    });
+  });
 
   return (
     <AuthLayout
       footer={
-        <p className="text-caption">
+        <p className="text-sm text-[#666d80]">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-medium text-[#009688] hover:underline">
-            Sign up
+          <Link href="/signup" className="font-semibold text-[#009688] hover:underline">
+            Create one
           </Link>
         </p>
       }
     >
-      <Card className="w-full max-w-md shadow-none">
-        <CardContent className="p-5">
-          <h2 className="text-section-heading">Sign in to your portal</h2>
+      <Card className="mx-auto w-full max-w-[440px] overflow-hidden rounded-[24px] border-[#e8eaed]/80 shadow-[0_24px_60px_-28px_rgba(7,53,47,0.35)]">
+        <div className="h-1 bg-gradient-to-r from-[#00796b] via-[#009688] to-[#4db6ac]" />
+        <CardContent className="p-6 sm:p-8">
+          <p className="text-overline">Welcome back</p>
+          <h2 className="plusJakarta mt-2 text-[1.65rem] font-semibold tracking-[-0.03em] text-[#0d0d12]">
+            Sign in to your portal
+          </h2>
+          <p className="interFont mt-2 text-sm leading-relaxed text-[#666d80]">
+            Use the work email and password for your institution account.
+          </p>
 
-          <div className="mt-6 space-y-3">
-            <Button variant="outline" className="w-full justify-center gap-2" onClick={enterPortal}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-              Continue with Google
-            </Button>
-            <Button variant="outline" className="w-full justify-center gap-2" onClick={enterPortal}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              Continue with LinkedIn
-            </Button>
-            <Button variant="outline" className="w-full justify-center gap-2" onClick={enterPortal}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M13 1h10v10H13z"/><path fill="#7FBA00" d="M1 13h10v10H1z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
-              Continue with Microsoft
-            </Button>
-          </div>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-[#e8eaed]" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-[#9aa1b4]">or use your work email</span>
-            </div>
-          </div>
-
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="mt-7 space-y-5" onSubmit={onSubmit}>
             <div className="grid gap-2">
-              <Label htmlFor="email">Work Email</Label>
+              <Label htmlFor="email" className="text-[#3f4658]">
+                Work email
+              </Label>
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 placeholder="you@organisation.org"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                disabled={isPending}
+                className={fieldClassName}
+                {...register("email")}
               />
+              {errors.email?.message && <p className="text-xs text-[#ef4444]">{errors.email.message}</p>}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="org">Organisation Name</Label>
-              <Input
-                id="org"
-                placeholder="Rockefeller Foundation"
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
+              <Label htmlFor="password" className="text-[#3f4658]">
+                Password
+              </Label>
+              <PasswordInput
+                id="password"
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                disabled={isPending}
+                className={fieldClassName}
+                {...register("password")}
               />
+              {errors.password?.message && <p className="text-xs text-[#ef4444]">{errors.password.message}</p>}
             </div>
-            <Button className="w-full" type="button" onClick={enterPortal}>
-              Enter Portal →
+            <Button
+              className="h-11 w-full rounded-xl text-[15px] shadow-[0_10px_20px_-12px_rgba(0,150,136,0.8)]"
+              type="submit"
+              disabled={isPending}
+              aria-busy={isPending}
+            >
+              {isPending ? "Signing in…" : "Sign in"}
+              {!isPending && <ArrowRight className="h-4 w-4" />}
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-[#9aa1b4]">
+          <p className="mt-6 text-center text-xs leading-relaxed text-[#9aa1b4]">
             By continuing you agree to complete CAC verification before initiating real withdrawals.
           </p>
         </CardContent>

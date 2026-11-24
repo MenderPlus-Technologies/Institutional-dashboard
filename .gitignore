@@ -18,6 +18,9 @@
 .DS_Store
 *.pem
 
+# nested provider app; it has its own git repository
+/indura-provider/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

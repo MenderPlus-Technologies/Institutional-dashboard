@@ -6,7 +6,7 @@ import { Menu } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { CACBanner } from "@/components/CACBanner";
-import { isLoggedIn } from "@/lib/session";
+import { isLoggedIn, needsTransactionPin } from "@/lib/session";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -15,6 +15,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoggedIn()) {
       router.replace("/");
+      return;
+    }
+    if (needsTransactionPin()) {
+      router.replace("/setup-pin");
     }
   }, [router]);
 

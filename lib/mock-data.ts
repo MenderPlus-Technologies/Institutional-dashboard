@@ -178,7 +178,10 @@ export const navSections = [
     label: "Main",
     items: [
       { label: "Overview", href: "/dashboard", icon: "LayoutDashboard" },
-      { label: "Beneficiaries", href: "/dashboard/beneficiaries", icon: "Users", badge: 3 },
+      { label: "Programmes", href: "/dashboard/programmes", icon: "FolderKanban" },
+      { label: "Transactions", href: "/dashboard/transactions", icon: "Receipt" },
+      { label: "Beneficiaries", href: "/dashboard/beneficiaries", icon: "Users" },
+      { label: "Allocations", href: "/dashboard/allocations", icon: "Banknote" },
       { label: "Fund Analytics", href: "/dashboard/analytics", icon: "BarChart3" },
       { label: "Treasury", href: "/dashboard/treasury", icon: "Landmark" },
       { label: "Reports", href: "/dashboard/reports", icon: "FileText" },

@@ -1,10 +1,37 @@
 "use client";
 
-import { organization } from "@/lib/mock-data";
-import { getOrgInitials } from "@/lib/utils";
+import { useInstitutionProfile } from "@/hooks/api/use-institution-profile";
+import {
+  formatInstitutionDate,
+  formatInstitutionStatus,
+  formatVerificationStatus,
+  institutionDisplayName,
+  institutionStatusTone,
+  institutionTypeLabel,
+} from "@/lib/institution-display";
+import { cn, getOrgInitials } from "@/lib/utils";
+
+const statusClassName = {
+  active: "border-emerald-200/80 bg-emerald-50/90 text-emerald-700",
+  pending: "border-amber-200 bg-amber-50 text-amber-800",
+  declined: "border-red-200 bg-red-50 text-red-700",
+  neutral: "border-[#e8eaed] bg-[#f8f9fb] text-[#666d80]",
+} as const;
+
+const statusDotClassName = {
+  active: "bg-emerald-500",
+  pending: "bg-amber-500",
+  declined: "bg-red-500",
+  neutral: "bg-[#9aa1b4]",
+} as const;
 
 export function DashboardHeader() {
-  const initials = getOrgInitials(organization.name);
+  const { data: institution, isError } = useInstitutionProfile();
+  const name = isError ? "Institution unavailable" : institutionDisplayName(institution);
+  const initials = getOrgInitials(isError ? "Institution" : name);
+  const tone = institutionStatusTone(institution?.status);
+  const showJoined = Boolean(institution?.joinedAt);
+  const verificationPending = institution?.verificationStatus?.toLowerCase() === "submitted";
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[#009688]/20 bg-gradient-to-br from-white via-white to-[#009688]/10">
@@ -25,33 +52,41 @@ export function DashboardHeader() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <h2 className="plusJakarta truncate text-base font-bold tracking-[-0.02em] text-[#0d0d12] sm:text-lg">
-              {organization.name}
+              {name}
             </h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            {institution?.status && (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                  statusClassName[tone]
+                )}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", statusDotClassName[tone])} />
+                {formatInstitutionStatus(institution.status)}
               </span>
-              Live
-            </span>
+            )}
+            {verificationPending && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                {formatVerificationStatus(institution?.verificationStatus)}
+              </span>
+            )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span className="inline-flex max-w-full items-center rounded-md bg-[#009688]/10 px-2 py-0.5 text-xs font-medium text-[#00796b]">
-              {organization.program}
+              {institution ? institutionTypeLabel(institution.type) : "—"}
             </span>
-            <span className="hidden text-[#d1d5db] sm:inline">·</span>
-            <span className="hidden text-xs text-[#666d80] sm:inline">{organization.orgType}</span>
           </div>
         </div>
 
-        <div className="hidden shrink-0 border-l border-[#009688]/10 pl-4 sm:block">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9aa1b4]">
-            Member since
-          </p>
-          <p className="plusJakarta mt-0.5 text-sm font-semibold text-[#0d0d12]">
-            {organization.memberSince}
-          </p>
-        </div>
+        {showJoined && (
+          <div className="hidden shrink-0 border-l border-[#009688]/10 pl-4 sm:block">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9aa1b4]">Joined</p>
+            <p className="plusJakarta mt-0.5 text-sm font-semibold text-[#0d0d12]">
+              {formatInstitutionDate(institution?.joinedAt)}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

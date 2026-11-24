@@ -14,6 +14,7 @@ import {
   FileText,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import { ModalSetTransactionPin } from "@/components/ModalSetTransactionPin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +37,14 @@ import {
   SettingsEditActions,
   SettingsFieldGroup,
 } from "@/components/settings/SettingsSection";
+import { useInstitutionProfile } from "@/hooks/api/use-institution-profile";
+import {
+  formatInstitutionDate,
+  formatInstitutionStatus,
+  formatVerificationStatus,
+  institutionDisplayName,
+  institutionTypeLabel,
+} from "@/lib/institution-display";
 import { organization, teamMembers, programFullNames } from "@/lib/mock-data";
 
 const settingsSections = [
@@ -52,13 +61,6 @@ type SettingsSectionId = (typeof settingsSections)[number]["id"];
 function isSettingsSectionId(value: string | null): value is SettingsSectionId {
   return settingsSections.some((section) => section.id === value);
 }
-
-const orgTypeLabels: Record<string, string> = {
-  foundation: "Foundation / Philanthropy",
-  ngo: "International NGO",
-  bilateral: "Bilateral Aid Agency",
-  un: "UN Agency",
-};
 
 const dashboardToggles = [
   {
@@ -125,6 +127,8 @@ function SettingsPageContent() {
   const [activeSection, setActiveSection] = useState<SettingsSectionId>(() =>
     isSettingsSectionId(sectionParam) ? sectionParam : "organisation"
   );
+  const { data: institution } = useInstitutionProfile();
+  const institutionName = institutionDisplayName(institution);
   const [contactEditing, setContactEditing] = useState(false);
   const [passwordEditing, setPasswordEditing] = useState(false);
   const [dashboardEditing, setDashboardEditing] = useState(false);
@@ -187,7 +191,7 @@ function SettingsPageContent() {
                   title="Legal identity"
                   description="Name and type changes require CAC, court order, or equivalent legal documentation."
                   action={
-                    <ModalRequestOrgChange currentName={organization.name}>
+                    <ModalRequestOrgChange currentName={institution ? institutionName : "—"}>
                       <Button variant="outline" size="sm" className="w-full gap-1.5 sm:w-auto">
                         <FileText className="h-4 w-4" />
                         Request name change
@@ -200,14 +204,40 @@ function SettingsPageContent() {
                       <SettingsLockedLabel>
                         <Label>Organisation Name</Label>
                       </SettingsLockedLabel>
-                      <SettingsReadOnlyValue value={organization.name} />
+                      <SettingsReadOnlyValue value={institution ? institutionName : "—"} />
                     </SettingsField>
                     <SettingsField>
                       <SettingsLockedLabel>
                         <Label>Organisation Type</Label>
                       </SettingsLockedLabel>
-                      <SettingsReadOnlyValue value={orgTypeLabels.foundation} />
+                      <SettingsReadOnlyValue value={institution ? institutionTypeLabel(institution.type) : "—"} />
                     </SettingsField>
+                    <SettingsField>
+                      <SettingsLockedLabel>
+                        <Label>Status</Label>
+                      </SettingsLockedLabel>
+                      <SettingsReadOnlyValue
+                        value={institution ? formatInstitutionStatus(institution.status) : "—"}
+                      />
+                    </SettingsField>
+                    {institution?.verificationStatus && (
+                      <SettingsField>
+                        <SettingsLockedLabel>
+                          <Label>Verification</Label>
+                        </SettingsLockedLabel>
+                        <SettingsReadOnlyValue
+                          value={formatVerificationStatus(institution.verificationStatus)}
+                        />
+                      </SettingsField>
+                    )}
+                    {institution?.joinedAt && (
+                      <SettingsField>
+                        <SettingsLockedLabel>
+                          <Label>Joined</Label>
+                        </SettingsLockedLabel>
+                        <SettingsReadOnlyValue value={formatInstitutionDate(institution.joinedAt)} />
+                      </SettingsField>
+                    )}
                   </SettingsFieldGrid>
                   <SettingsCallout icon={Shield} variant="teal">
                     To change your registered organisation name or type, submit a request with supporting
@@ -354,7 +384,7 @@ function SettingsPageContent() {
               id="security"
               icon={Lock}
               title="Security"
-              description="Manage your password and account protection settings."
+              description="Manage your password, transaction PIN, and account protection settings."
               action={
                 passwordEditing ? (
                   <SettingsEditActions
@@ -398,6 +428,19 @@ function SettingsPageContent() {
                     <p className="text-caption mt-0.5">Last changed 30 days ago · Click &ldquo;Change password&rdquo; to update</p>
                   </div>
                 )}
+
+                <SettingsSubsection title="Transaction PIN">
+                  <div className="flex flex-col gap-3 rounded-xl border border-[#e8eaed] bg-[#f8f9fb] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-caption">
+                      Create or update the 4-digit PIN used to confirm disbursements and withdrawals.
+                    </p>
+                    <ModalSetTransactionPin>
+                      <Button variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+                        Set transaction PIN
+                      </Button>
+                    </ModalSetTransactionPin>
+                  </div>
+                </SettingsSubsection>
 
                 <SettingsSubsection title="Account protection">
                   <SettingsToggleGroup>

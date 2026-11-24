@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  Wallet, Users, TrendingUp, Heart, ArrowDownToLine, ArrowUpFromLine,
-  BarChart3, PieChart, ShieldAlert, CheckCircle2, Megaphone, UserPlus, FileText, Bell, Target,
+  Wallet, Users, ArrowDownToLine, ArrowUpFromLine, FolderKanban, Banknote,
+  BarChart3, PieChart, CheckCircle2, Megaphone, FileText, Bell, Target,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgramTabs } from "@/components/ProgramTabs";
@@ -17,16 +17,23 @@ import { Badge } from "@/components/ui/badge";
 import { ModalDeposit } from "@/components/ModalDeposit";
 import { ModalDisburse } from "@/components/ModalDisburse";
 import { ModalAnnounce } from "@/components/ModalAnnounce";
-import { ModalInviteMember } from "@/components/ModalInviteMember";
 import { ModalGenerateReport } from "@/components/ModalGenerateReport";
 import { ModalAlerts } from "@/components/ModalAlerts";
 import { ModalEnrolIndividual } from "@/components/ModalEnrolIndividual";
-import { overviewStats, periodFilters } from "@/lib/mock-data";
-import { formatCurrency } from "@/lib/utils";
+import { useInstitutionDashboard } from "@/hooks/api/use-institution-dashboard";
+import { useInstitutionProfile } from "@/hooks/api/use-institution-profile";
+import { formatKobo } from "@/lib/api/dashboard";
+import { periodFilters } from "@/lib/mock-data";
 
 export default function DashboardPage() {
   const [activePeriod, setActivePeriod] = useState(periodFilters[0]);
-  const [activeProgram, setActiveProgram] = useState("maternal");
+  const [activeProgram, setActiveProgram] = useState<string | undefined>();
+  const { data: institution } = useInstitutionProfile();
+  const dashboard = useInstitutionDashboard(institution?.id);
+  const report = dashboard.data;
+  const currency = report?.currency ?? "NGN";
+  const money = (kobo?: number) => (report && kobo !== undefined ? formatKobo(kobo, currency) : "—");
+  const count = (value?: number) => (report && value !== undefined ? String(value) : "—");
 
   const headerActions = (
     <>
@@ -36,12 +43,6 @@ export default function DashboardPage() {
           Announce
         </Button>
       </ModalAnnounce>
-      <ModalInviteMember>
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <UserPlus className="h-4 w-4" />
-          Invite Member
-        </Button>
-      </ModalInviteMember>
       <ModalGenerateReport>
         <Button variant="outline" size="sm" className="gap-1.5">
           <FileText className="h-4 w-4" />
@@ -74,11 +75,11 @@ export default function DashboardPage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <ModalDeposit>
+        <ModalDeposit programmeId={activeProgram}>
           <button className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#e8eaed] bg-white p-3.5 text-left shadow-none">
             <div className="min-w-0">
               <p className="text-body font-semibold">Deposit Funds</p>
-              <p className="text-caption">Add program budget to your ring-fenced wallet</p>
+              <p className="text-caption">Create a Flutterwave deposit for a programme</p>
             </div>
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#009688]/10 text-[#009688]">
               <ArrowDownToLine className="h-5 w-5" />
@@ -100,47 +101,105 @@ export default function DashboardPage() {
 
       <ProgramTabs active={activeProgram} onChange={setActiveProgram} />
 
+      {dashboard.isError && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5">
+          <p className="text-sm text-red-600">Could not load the dashboard.</p>
+          <Button variant="outline" size="sm" onClick={() => dashboard.refetch()}>
+            Retry
+          </Button>
+        </div>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Program Funds Managed"
-          value={formatCurrency(overviewStats.programFundsManaged)}
+          title="Available"
+          value={money(report?.funds.programmeAvailableKobo)}
+          subtitle={report ? `${formatKobo(report.funds.beneficiaryRestrictedKobo, currency)} restricted` : undefined}
           icon={Wallet}
           footer={
-            <p className="text-caption">
-              No deposits yet —{" "}
-              <ModalDeposit>
-                <button className="font-medium text-[#009688] hover:underline">Deposit now</button>
-              </ModalDeposit>
-            </p>
+            report?.funds.programmeAvailableKobo === 0 ? (
+              <p className="text-caption">
+                No deposits yet —{" "}
+                <ModalDeposit programmeId={activeProgram}>
+                  <button className="font-medium text-[#009688] hover:underline">Deposit now</button>
+                </ModalDeposit>
+              </p>
+            ) : undefined
           }
         />
         <StatCard
-          title="Enrolled Beneficiaries"
-          value={String(overviewStats.enrolledBeneficiaries)}
-          icon={Users}
-          iconColor="bg-[#009688]/10 text-[#009688]"
-          footer={
-            <p className="text-caption">
-              No enrollments yet —{" "}
-              <ModalEnrolIndividual>
-                <button className="font-medium text-[#009688] hover:underline">Add beneficiaries</button>
-              </ModalEnrolIndividual>
-            </p>
-          }
+          title="Funded"
+          value={money(report?.funds.fundedKobo)}
+          subtitle={report ? `${formatKobo(report.funds.spentKobo, currency)} spent` : undefined}
+          icon={Banknote}
         />
         <StatCard
-          title="Treasury Float (MTD)"
-          value={formatCurrency(overviewStats.treasuryFloatMTD)}
-          subtitle="Earns when funds are deposited"
-          icon={TrendingUp}
+          title="Withdrawn"
+          value={money(report?.funds.withdrawnKobo)}
+          subtitle={report ? `${formatKobo(report.funds.withdrawalPendingKobo, currency)} pending` : undefined}
+          icon={ArrowUpFromLine}
           iconColor="bg-amber-50 text-amber-600"
         />
         <StatCard
-          title="Avg. Healthscore"
-          value="—"
-          subtitle="Available after first disbursements"
-          icon={Heart}
-          iconColor="bg-[#009688]/10 text-[#009688]"
+          title="Enrolled beneficiaries"
+          value={count(report?.beneficiaries.enrolled)}
+          subtitle={
+            report
+              ? `${report.beneficiaries.total} total · ${report.beneficiaries.pendingRegistration} pending registration`
+              : undefined
+          }
+          icon={Users}
+          footer={
+            report?.beneficiaries.enrolled === 0 ? (
+              <p className="text-caption">
+                No enrollments yet —{" "}
+                <ModalEnrolIndividual>
+                  <button className="font-medium text-[#009688] hover:underline">Add beneficiaries</button>
+                </ModalEnrolIndividual>
+              </p>
+            ) : undefined
+          }
+        />
+        <StatCard
+          title="Programmes"
+          value={count(report?.programmes.active)}
+          subtitle={
+            report
+              ? `${report.programmes.total} total · ${report.programmes.draft} draft · ${report.programmes.paused} paused · ${report.programmes.closed} closed`
+              : undefined
+          }
+          icon={FolderKanban}
+        />
+        <StatCard
+          title="Active beneficiaries"
+          value={count(report?.beneficiaries.active)}
+          subtitle={
+            report
+              ? `${report.beneficiaries.suspended} suspended · ${report.beneficiaries.deactivated} deactivated`
+              : undefined
+          }
+          icon={Users}
+        />
+        <StatCard
+          title="Withdrawals"
+          value={count(report?.withdrawals.total)}
+          subtitle={
+            report
+              ? `${report.withdrawals.settled} settled · ${report.withdrawals.processing} processing · ${report.withdrawals.failed} failed`
+              : undefined
+          }
+          icon={ArrowUpFromLine}
+          iconColor="bg-amber-50 text-amber-600"
+        />
+        <StatCard
+          title="Withdrawal requests"
+          value={count(report?.withdrawals.requested)}
+          subtitle={
+            report
+              ? `${report.withdrawals.queued} queued · ${report.withdrawals.returned} returned`
+              : undefined
+          }
+          icon={Banknote}
         />
       </div>
 
@@ -193,18 +252,16 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Leakage Rate</CardTitle>
+            <CardTitle>Withdrawals</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 py-1 text-center">
-              <p className="text-stat text-[#22c55e]">{overviewStats.leakageRate}%</p>
+              <p className="text-stat text-[#0d0d12]">{count(report?.withdrawals.total)}</p>
               <p className="text-caption">
-                vs {overviewStats.sectorLeakageAvg} sector average
+                {report
+                  ? `${report.withdrawals.settled} settled · ${report.withdrawals.failed} failed · ${report.withdrawals.returned} returned`
+                  : "—"}
               </p>
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-caption text-emerald-800">
-                <ShieldAlert className="h-4 w-4 shrink-0" />
-                <span>All transactions ring-fenced to approved health categories only</span>
-              </div>
             </div>
           </CardContent>
         </Card>

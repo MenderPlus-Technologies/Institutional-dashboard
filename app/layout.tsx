@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/providers/query-provider";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -17,9 +19,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "InduraHealth — Institutional Portal",
   description: "Financial infrastructure portal for African healthcare programs",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
@@ -32,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.variable} ${inter.variable} interFont antialiased`}
       >
-        {children}
+        <QueryProvider>
+          {children}
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );
