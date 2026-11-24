@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const plusJakarta = localFont({
+  src: "../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2",
   variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: "200 800",
+  display: "swap",
 });
 
-const inter = Inter({
+const inter = localFont({
+  src: "../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
   variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
